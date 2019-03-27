@@ -8,8 +8,8 @@ with open("requirements.txt", "r") as req:
 	dependencies = req.read()
 
 setuptools.setup(
-    name="m3-pyside2-style-test-rc1",
-    version="0.9.4"+"rc10",
+    name="m3-pyside2-style-test",
+    version=testkit.__version__,
     author=testkit.__author__,
     author_email="cplusplusook@gmail.com",
 	license="MIT",
