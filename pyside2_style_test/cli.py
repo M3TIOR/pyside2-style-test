@@ -20,16 +20,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE
-"""This module is responsible for making command line functions provided
-by this library available to setuptools.
+"""This module is responsible specifically for making command line functions
+provided by this library available to setuptools. However, it's left in the
+public scope just in case someone decides they want to do more with it.
 """
 
 
 from . import PySide2StyleTestWidget as _PySide2StyleTestWidget
 from . import __version__, CommandLineError
 from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import QCommandLineParser
 
+import argparse
 import sys
 
 
@@ -51,38 +52,25 @@ def main(*argv, test_widget=_PySide2StyleTestWidget):
 
 	# Init qt-app as global so it can be used to parse arguments and collect
 	# opperational data which can be used by other UI implementations.
-	qt_application = QApplication(list(argv) if len(argv) else sys.argv)
+	qt_application = QApplication(list(*argv) if len(argv) else sys.argv)
 	qt_application.setApplicationName("pyside2-style-test")
 	qt_application.setApplicationVersion(__version__)
 
-	# Use QT's native command line parser because it auto-collects the
-	# QT specific arguments and discourages argument namespace pollution.
-	q_parser = QCommandLineParser()
-	q_parser.setApplicationDescription("""A QSS preview script.""")
-	q_parser.addHelpOption()
-	q_parser.addVersionOption()
+	parser = argparse.ArgumentParser(
+		description="""A QSS preview script.""",
+		epilog="""NOTE: if specifying a stylesheet via the command line using
+		the --stylesheet option, be aware that it will be overriden by whatever
+		stylesheet you load after the file prompt or by the positional argument.
+		One of which is required for the program to run."""
+	)
+	parser.add_argument("--file",
+		help="the stylesheet you want to test",
+		required=True,
+	)
 
-	# Add posititional arguments using Qt's locale system.
-	positionals = {
-			"stylesheet": (QApplication.translate("main", "The QSS file you want to test.", ))
-	}
-	for name, translations in positionals.items():
-		q_parser.addPositionalArgument(name, translations)
+	arguments = parser.parse_args(qt_application.arguments()[1:])
 
-	# Process the positional arguments
-	status = q_parser.process(sys.argv)
-	args = q_parser.positionalArguments()
-	l = len(args)
-	if l < len(positionals.keys()):
-		# we should only have one positional argument, the stylesheet, so we
-		# raise an argument when we find more.
-		name = tuple(positionals.keys())[l]
-		raise CommandLineError(l, "Missing required positional argument: %s" %(name))
-		sys.exit()
-
-	stylesheet_location = args[0]
-
-	GUI = test_widget(stylesheet_location)
+	GUI = test_widget(arguments.file)
 	GUI.show()
 
 	# Hand off control of signal processing to Qt. This function is
@@ -101,5 +89,5 @@ def main(*argv, test_widget=_PySide2StyleTestWidget):
 
 def _main():
 	"""Main function alias for command line setuptools script"""
-	main(*sys.argv)
+	main(sys.argv)
 	sys.exit()

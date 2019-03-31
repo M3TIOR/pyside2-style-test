@@ -26,4 +26,3 @@ from .cli import main
 
 
 main()
-sys.exit()

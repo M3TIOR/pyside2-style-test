@@ -61,7 +61,7 @@ from PySide2.QtCore import *
 
 # Standard Library Imports
 #from threading import Thread, Event
-import sys
+import sys, io
 
 
 _qt_supported_html_subset = """
@@ -488,15 +488,17 @@ class PySide2StyleTestWidget(QMainWindow):
 
 		return richtext
 
-	def __del__(self):
-		self._stylesheet.close()
-
 	def __init__(self, stylesheet):
 		"""Construct the GUI in memory."""
 		QMainWindow.__init__(self)
 
-		#self.close = Event() Unneeded
-		self._stylesheet = open(stylesheet, "r")
+		# IOBase in python3 provides __del__ meta function by default
+		# upon variable destruction to close the file so we don't have to.
+		try:
+			self._stylesheet = open(stylesheet, "r")
+		except (OSError) as e:
+			print("%s `%s`" %(e.strerror, e.filename), file=sys.stderr)
+			sys.exit(e.errno)
 
 		def refresh_stylesheet():
 			print("refreshing stylesheet!")
