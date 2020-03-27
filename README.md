@@ -2,6 +2,12 @@
 [![Build Status](https://travis-ci.org/M3TIOR/pyside2-style-test.svg?branch=master)](https://travis-ci.org/M3TIOR/pyside2-style-test)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/M3TIOR/pyside2-style-test/blob/master/LICENSE)
 
+## Discontinued
+
+I just learned there is a much more ambitious project [here](https://github.com/hustlei/QssStylesheetEditor) by hustlei so as of 3/26/2020 I'd recommend you head over there. If I decide to work on this anymore, It'll be by contributing to their work. Good job @world!
+
+---------------------------------------------------------------------------------
+
 A Qt-5 live updating styleable component test kit.
 
 This application displays Qt-5 compliant widgets with a live preview of edits
